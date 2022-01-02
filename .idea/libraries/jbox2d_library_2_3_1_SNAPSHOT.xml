@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="jbox2d-library-2.3.1-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/Downloads/Box2D-for-Processing-master/Box2D-for-Processing-master/Box2D-for-Processing/lib/jbox2d-library-2.3.1-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
