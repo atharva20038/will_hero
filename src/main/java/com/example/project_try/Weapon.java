@@ -2,12 +2,14 @@ package com.example.project_try;
 
 import javafx.animation.AnimationTimer;
 
+import java.io.Serializable;
+
 public abstract class Weapon extends Game_objects{
     protected int lifeReduced;
-    AnimationTimer animationTimer;
 
-    Weapon(Hero hero) {
-        super(hero.coordinate, "src/main/java/com/example/project_try/assets/WeaponSword.png");
+
+    Weapon(Hero hero,String image) {
+        super(hero.coordinate,image );
     }
 
     public int getLifeReduced() {

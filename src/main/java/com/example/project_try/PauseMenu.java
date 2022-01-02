@@ -8,18 +8,29 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 
-public class HelloApplication extends Application {
-    @Override
+public class PauseMenu implements Serializable{
+    User user = new User();
+    Game gameMenu = new Game(user,this,null);
+    transient Stage stage;
+    transient Label scoreLabel;
+    transient Label coinCount;
+
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+
     public void start(Stage stage) throws IOException {
+        this.stage = stage;
         //establishing anchor pane
         AnchorPane root = new AnchorPane();
 
@@ -38,16 +49,16 @@ public class HelloApplication extends Application {
         bg.setFitWidth(723.2);
 
         //Score label
-        Label scoreLabel = new Label("SCORE : ");
-        styleLabel(scoreLabel,301,12,24);
+        Label score = new Label("SCORE : ");
+        styleLabel(score,301,12,24);
 
         //Score
-        Label score = new Label("0");
-        styleLabel(score,402,5,36);
+        scoreLabel = new Label(gameMenu.getScore()+"");
+        styleLabel(scoreLabel,402,5,36);
 
-        //Coin Count
-        Label count = new Label("0");
-        styleCoinLabel(count,558,17,20);
+//       Coin Count
+        coinCount = new Label(gameMenu.getCoinNumber()+"");
+        styleCoinLabel(coinCount,558,17,20);
 
         //Coin Image
         ImageView coin = new ImageView();
@@ -60,7 +71,7 @@ public class HelloApplication extends Application {
         }
 
         coin.setImage(coinImage);
-        setImage(coin,586,16,32,32);
+        setImage(coin,600,16,32,32);
 
         //SideDecor Image
         ImageView sideDecor = new ImageView();
@@ -136,21 +147,30 @@ public class HelloApplication extends Application {
         EventHandler printResume = new EventHandler() {
             @Override
             public void handle(Event event) {
-                System.out.println("Resume Game");
+                buttonAction(1);
             }
         };
 
         resumeButton.setOnAction(printResume);
 
         //save button
-        Button saveButton = new Button("Save Game");
+        Button saveButton = new Button("Load Game");
         styleButton(saveButton,301,189,121,35);
 
 
         EventHandler savePrint = new EventHandler() {
             @Override
             public void handle(Event event) {
-                System.out.println("Save Game");
+                buttonAction(2);
+//                try {
+//
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                } catch (ClassNotFoundException e) {
+//                    e.printStackTrace();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
             }
         };
 
@@ -160,29 +180,25 @@ public class HelloApplication extends Application {
         Button newGameButton = new Button("New Game");
         styleButton(newGameButton,301,258,121,35);
 
+
         EventHandler newGamePrint = new EventHandler() {
             @Override
             public void handle(Event event) {
-                System.out.println("Load New Game");
+               buttonAction(3);
             }
+
         };
 
         newGameButton.setOnAction(newGamePrint);
 
         //menu button
-        Button menuButton = new Button("Main Menu");
+        Button menuButton = new Button("Exit");
         styleButton(menuButton,301,321,121,35);
 
         EventHandler menuPrint = new EventHandler() {
             @Override
             public void handle(Event event) {
-                System.out.println("Load Main Menu");
-                Game gameMenu = new Game();
-                try {
-                    gameMenu.display(stage);
-                } catch (FileNotFoundException | InterruptedException e) {
-                    e.printStackTrace();
-                }
+                buttonAction(4);
             }
         };
 
@@ -199,7 +215,7 @@ public class HelloApplication extends Application {
         root.getChildren().addAll(hero);
         root.getChildren().addAll(weapon);
         root.getChildren().addAll(score);
-        root.getChildren().addAll(count);
+        root.getChildren().addAll(coinCount);
         root.getChildren().addAll(coin);
         root.getChildren().addAll(resumeButton);
         root.getChildren().addAll(saveButton);
@@ -212,10 +228,6 @@ public class HelloApplication extends Application {
         stage.setTitle("Hello!");
         stage.setScene(scene);
         stage.show();
-    }
-
-    public static void main(String[] args) {
-        launch();
     }
 
     public void styleButton(Button button,double x,double y,double w,double h){
@@ -245,6 +257,71 @@ public class HelloApplication extends Application {
         image.setFitHeight(h);
         image.setLayoutX(x);
         image.setLayoutY(y);
+    }
+
+    public void SaveGame() throws IOException, ClassNotFoundException, InterruptedException {
+        FileOutputStream fileOutputStream = new FileOutputStream("out.txt");
+        ObjectOutputStream outputStream = new ObjectOutputStream(fileOutputStream);
+        SaveGame saveGame = new SaveGame(gameMenu);
+        outputStream.writeObject(saveGame);
+        outputStream.close();
+        fileOutputStream.close();
+        //Exit To Main Menu
+
+    }
+
+    public SaveGame LoadGame() throws IOException, ClassNotFoundException, InterruptedException {
+        FileInputStream fileInputStream = new FileInputStream("out.txt");
+        ObjectInputStream inputStream = new ObjectInputStream(fileInputStream);
+        SaveGame saveGame = (SaveGame) inputStream.readObject();
+//        saveGame.game.display(stage);
+
+        saveGame.game.loadPreviousGame(stage,saveGame.game);
+        inputStream.close();
+        fileInputStream.close();
+        return saveGame;
+    }
+
+    public void buttonAction(int verbose){
+        switch (verbose){
+            case 1:
+                //resume
+                System.out.println("Resume Game");
+                try {
+                    LoadGame();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                break;
+
+            case 2:
+                //Load Saved Game
+                System.out.println("Load Game");
+                break;
+            case 3:
+                PauseMenu pauseMenu = this;
+                //New Game
+                System.out.println("Load New Game");
+                try {
+                    Game game = new Game(user,pauseMenu,null);
+                    gameMenu = game;
+                    gameMenu.display(stage);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case 4:
+                //Exit
+                System.out.println("Exit");
+                System.exit(0);
+                break;
+        }
     }
 
 

@@ -2,6 +2,7 @@ package com.example.project_try;
 
 import javafx.scene.layout.AnchorPane;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Characters extends Game_objects{
@@ -10,7 +11,7 @@ public class Characters extends Game_objects{
     protected ArrayList<Islands> islands;
     protected ArrayList<Coin> coins;
     protected ArrayList<Chest> chests;
-    protected AnchorPane root;
+    protected transient AnchorPane root;
 
 
     Characters(Coordinate coordinate, String image,int life,AnchorPane root,ArrayList<Islands> islands,ArrayList<Orcs> orcs,ArrayList<Chest> chests,ArrayList<Coin> coins) {

@@ -1,5 +1,7 @@
 package com.example.project_try;
 
+import java.io.Serializable;
+
 public class WeaponChest extends Chest{
     private int verbose;
 
@@ -12,9 +14,6 @@ public class WeaponChest extends Chest{
     public void afterOpen(Hero hero) {
         //weapon upgrade
         hero.getHelmet().getWeapons().get(verbose).upgrade(hero);
-
-        if(hero.getHelmet().getActiveWeapon()==null){
-            hero.getHelmet().setActiveWeapon(hero.getHelmet().getWeapons().get(verbose));
-        }
+        hero.getHelmet().setActiveWeapon(hero.getHelmet().getWeapons().get(verbose));
     }
 }

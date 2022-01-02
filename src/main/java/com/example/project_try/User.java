@@ -1,13 +1,14 @@
 package com.example.project_try;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     private long highScore;
     private Game currentGame;
     private long coinCount;
 
     User(){
         highScore = 0;
-        currentGame = new Game();
         coinCount = 0;
     }
 
@@ -23,6 +24,7 @@ public class User {
         return highScore;
     }
 
+
     public void setCoinCount(long coinCount) {
         this.coinCount = coinCount;
     }
@@ -34,4 +36,6 @@ public class User {
     public void setHighScore(long highScore) {
         this.highScore = highScore;
     }
+
+
 }

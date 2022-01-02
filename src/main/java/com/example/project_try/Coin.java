@@ -1,5 +1,7 @@
 package com.example.project_try;
 
+import java.io.Serializable;
+
 public class Coin extends Game_objects{
     private boolean isCollected;
 

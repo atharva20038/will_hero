@@ -1,6 +1,6 @@
 package com.example.project_try;
 
 
-public interface Collision {
+public interface Collision{
     void collide();
 }

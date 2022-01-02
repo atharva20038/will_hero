@@ -1,6 +1,8 @@
 package com.example.project_try;
 
-public class Coordinate {
+import java.io.Serializable;
+
+public class Coordinate implements Serializable {
     private int xStart;
     private int xEnd;
     private int yStart;

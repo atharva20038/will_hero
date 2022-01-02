@@ -1,7 +1,9 @@
 package com.example.project_try;
 
 
-public abstract class Chest extends Game_objects {
+import java.io.Serializable;
+
+public abstract class Chest extends Game_objects{
     private boolean isOpen;
 
     Chest(Coordinate coordinate, String image) {

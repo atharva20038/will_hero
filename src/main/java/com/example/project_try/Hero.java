@@ -14,13 +14,17 @@ import javafx.util.Duration;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Hero extends Characters implements Collision{
+
     private long coinScore;
     private Game currentGame;
-    private Label coinCount;
+    private transient Label coinCount;
     private Helmet helmet;
+    private transient AnchorPane root;
 
 
     Hero(Coordinate coordinate,String image,Game currentGame,int life,AnchorPane root,ArrayList<Orcs> orcs,ArrayList<Chest> chests,ArrayList<Coin> coins,ArrayList<Islands> islands,Label coinCount) {
@@ -33,7 +37,7 @@ public class Hero extends Characters implements Collision{
         this.coins = coins;
         this.islands = islands;
         this.coinCount = coinCount;
-        helmet = new Helmet(this);
+        helmet = Helmet.getInstance(this,root);
     }
 
     public long getCoinCount() {
@@ -62,8 +66,12 @@ public class Hero extends Characters implements Collision{
         AnimationTimer animationTimerChest = new AnimationTimer() {
             @Override
             public void handle(long l) {
+                if (hero.getHelmet().getActiveWeapon()!= null) {
+                    Coordinate temp = new Coordinate((int)hero.getImageView().getBoundsInParent().getMinX() - 8, (int) hero.imageView.getBoundsInParent().getMinY() - 10, 20, 50);
+                    hero.getHelmet().getActiveWeapon().setCoordinate(temp);
+                }
                 for(int i=0;i< chests.size();i++){
-                    if(imageView.getBoundsInParent().intersects(chests.get(i).getImageView().getBoundsInParent())&&!chests.get(i).getIsOpen()){
+                    if(!chests.get(i).getIsOpen()&&imageView.getBoundsInParent().intersects(chests.get(i).getImageView().getBoundsInParent())){
                         root.getChildren().remove(chests.get(i).getImageView());
                         openChest(i);
                         if(chests.get(i) instanceof WeaponChest){
@@ -113,8 +121,9 @@ public class Hero extends Characters implements Collision{
                 for(int i=0;i<orcs.size();i++){
                     //collide orc
                     if(orcs.get(i).imageView.getBoundsInParent().intersects(imageView.getBoundsInParent())){
-                        WeaponAnimate();
+
                         if(helmet.getActiveWeapon()!=null){
+                            WeaponAnimate();
                             helmet.getActiveWeapon().attack(orcs.get(i));
                         }
 
@@ -210,7 +219,11 @@ public class Hero extends Characters implements Collision{
         translateTransition.setOnFinished(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                currentGame.endGame();
+                try {
+                    currentGame.endGame();
+                } catch (IOException | ClassNotFoundException | InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         });
         SequentialTransition sequentialTransition = new SequentialTransition(this.imageView,translateTransition);
@@ -227,5 +240,17 @@ public class Hero extends Characters implements Collision{
 
     public Helmet getHelmet() {
         return helmet;
+    }
+
+    public void setRoot(AnchorPane root) {
+        this.root = root;
+    }
+
+    public void setHelmet(Helmet helmet) {
+        this.helmet = helmet;
+    }
+
+    public void setCoinCount(Label coinCount) {
+        this.coinCount = coinCount;
     }
 }

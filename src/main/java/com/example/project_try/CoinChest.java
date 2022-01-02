@@ -1,5 +1,7 @@
 package com.example.project_try;
 
+import java.io.Serializable;
+
 public class CoinChest extends Chest{
 
     CoinChest(Coordinate coordinate, String image) {
