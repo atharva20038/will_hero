@@ -11,5 +11,6 @@ public class CoinChest extends Chest{
     @Override
     public void afterOpen(Hero hero) {
         hero.setCoinScore(hero.getCoinScore()+30);
+        hero.life += 30;
     }
 }

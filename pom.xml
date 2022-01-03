@@ -112,7 +112,7 @@
                         <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>com.example.project_try/com.example.project_try.PauseMenu</mainClass>
+                            <mainClass>com.example.project_try/com.example.project_try.GameMenu</mainClass>
                         </configuration>
                     </execution>
                 </executions>

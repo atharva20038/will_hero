@@ -1,8 +1,6 @@
 package com.example.project_try;
 
-import javafx.animation.AnimationTimer;
-import javafx.animation.SequentialTransition;
-import javafx.animation.TranslateTransition;
+import javafx.animation.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.layout.AnchorPane;
@@ -16,15 +14,17 @@ public class Orcs extends Characters implements Collision{
     private ArrayList<Orcs> orcs;
     private boolean isDead;
     private transient AnchorPane root;
+    private int reduceLife;
 
 
-    Orcs(Coordinate coordinate, String image, int setToY, int life,AnchorPane root,ArrayList<Islands> islands,ArrayList<Orcs> orcs,ArrayList<Chest> chests,ArrayList<Coin> coins) {
+    Orcs(Coordinate coordinate, String image, int setToY, int life,AnchorPane root,ArrayList<Islands> islands,ArrayList<Orcs> orcs,ArrayList<Chest> chests,ArrayList<Coin> coins,int reduceLife) {
         super(coordinate, image,life,root,islands,orcs,chests,coins);
         this.setToY = setToY;
         this.orcs = orcs;
         collide();
         isDead = false;
         this.root = root;
+        this.reduceLife = reduceLife;
     }
 
     public void setRoot(AnchorPane root) {
@@ -45,7 +45,9 @@ public class Orcs extends Characters implements Collision{
 
     }
 
-
+    public void attack(Hero hero){
+        hero.reduceLife(reduceLife);
+    }
 
     private void AnimateY(ArrayList<Islands> islands,ArrayList<Orcs> orcs,AnchorPane root){
         TranslateTransition translateTransition = new TranslateTransition(Duration.millis(1000));
@@ -64,20 +66,18 @@ public class Orcs extends Characters implements Collision{
     }
 
     private void Gravity(ArrayList<Islands> islands,ArrayList<Orcs> orcs,AnchorPane root){
-        TranslateTransition translateTransition = new TranslateTransition(Duration.millis(2000));
-        translateTransition.setCycleCount(1);
-        translateTransition.setFromY(10);
-        translateTransition.setToY(500);
-        translateTransition.setOnFinished(new EventHandler<ActionEvent>() {
+        KeyValue keyValue = new KeyValue(imageView.yProperty(),500);
+        KeyFrame keyFrame = new KeyFrame(Duration.millis(2000),keyValue);
+        Timeline timeline = new Timeline(keyFrame);
+        timeline.setCycleCount(1);
+        timeline.setOnFinished(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                //remove orc from list of objects
                 orcs.remove(this);
                 root.getChildren().remove(imageView);
             }
         });
-        SequentialTransition sequentialTransition = new SequentialTransition(imageView,translateTransition);
-        sequentialTransition.play();
+        timeline.play();
     }
 
     @Override

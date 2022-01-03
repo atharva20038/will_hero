@@ -21,9 +21,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Game implements Serializable {
-    private PauseMenu helloApplication;
+    private transient Stage stage;
+    private GameMenu helloApplication;
     private Game previousGame;
     private User user;
     private int score;
@@ -42,7 +44,8 @@ public class Game implements Serializable {
     private double labelCoin;
     private int coinNumber;
 
-    Game(User user, PauseMenu pauseMenu,Game game){
+
+    Game(User user, GameMenu pauseMenu, Game game){
         previousGame = game;
         this.user = user;
         user.setCurrentGame(this);
@@ -53,6 +56,10 @@ public class Game implements Serializable {
         coins = new ArrayList<>();
         orcs = new ArrayList<>();
         coinNumber = 0;
+    }
+
+    public Stage getStage() {
+        return stage;
     }
 
     public double getLabelCoin() {
@@ -83,7 +90,13 @@ public class Game implements Serializable {
         animationTimer.start();
     }
 
+    public void win(Stage stage){
+        Win win = new Win();
+        win.win(stage);
+    }
+
     public Stage display(Stage stage) throws FileNotFoundException, InterruptedException {
+        this.stage = stage;
         System.out.println("New Game");
 
         root = new AnchorPane();
@@ -132,7 +145,7 @@ public class Game implements Serializable {
         //hero
         heroObj = new Hero(new Coordinate(120,170,40,40),"src/main/java/com/example/project_try/assets/Helmet4.png",this,1000,root,orcs,chests,coins,islands,coinCount);
 
-        PauseMenu helloApplication = this.helloApplication;
+        GameMenu helloApplication = this.helloApplication;
         EventHandler onKeyPressed = new EventHandler() {
             @Override
             public void handle(Event event) {
@@ -213,7 +226,7 @@ public class Game implements Serializable {
 
     private void createWorld(AnchorPane root){
         //Island Spawning
-        for(int i=0;i<100;i++){
+        for(int i=0;i<10;i++){
             Islands island1 = new Islands(new Coordinate( 100+i*1000,210,97,154),"src/main/java/com/example/project_try/assets/BalancingRocks4.png");
             Islands island2 = new Islands(new Coordinate( 400+i*1000,210,150,102),"src/main/java/com/example/project_try/assets/BalancingRocks5.png");
             Islands island3 = new Islands(new Coordinate(750+i*1000,210,150,102),"src/main/java/com/example/project_try/assets/BalancingRocks3.png");
@@ -226,7 +239,7 @@ public class Game implements Serializable {
         }
 
         //Spawning Chest
-        for(int i =0;i<100;i+=2){
+        for(int i =0;i<10;i+=2){
             if(i%4==0){
                 Chest chest = new WeaponChest(new Coordinate(400+i*1000,170,60,40),"src/main/java/com/example/project_try/assets/ChestClosed.png");
                 chests.add(chest);
@@ -239,7 +252,7 @@ public class Game implements Serializable {
         }
 
         //Coin Spawn
-        for (int i=0;i<100;i++){
+        for (int i=0;i<10;i++){
             Coin coin1 = new Coin(new Coordinate(231+i*1000,100,30,30),"src/main/java/com/example/project_try/assets/Coin.png");
             Coin coin2 = new Coin(new Coordinate(270+i*1000,100,30,30),"src/main/java/com/example/project_try/assets/Coin.png");
             Coin coin3 = new Coin(new Coordinate(309+i*1000,100,30,30),"src/main/java/com/example/project_try/assets/Coin.png");
@@ -264,25 +277,32 @@ public class Game implements Serializable {
 
 
 
-        for(int i=1;i<100;i++){
+        for(int i=1;i<10;i++){
 
-//                Orcs orc1 = new Orcs(new Coordinate(120 +i*1000,170,40,50),"src/main/java/com/example/project_try/assets/Orc1.png",10,30,root,islands,orcs,chests,coins);
-//                orcs.add(orc1);
-//                orc1.AnimateGravity(islands,orcs,root);
-//                root.getChildren().addAll(orc1.imageView);
 
-                Orcs orc2 = new Orcs(new Coordinate( 450+i*1000,170,40,50),"src/main/java/com/example/project_try/assets/RedOrc1.png",10,30,root,islands,orcs,chests,coins);
+
+                Orcs orc2 = new Orcs(new Coordinate( 450+i*1000,170,40,50),"src/main/java/com/example/project_try/assets/Orc1.png",10,30,root,islands,orcs,chests,coins,10);
                 orcs.add(orc2);
                 orc2.AnimateGravity(islands,orcs,root);
                 root.getChildren().addAll(orc2.imageView);
 
-                Orcs orc3 = new Orcs(new Coordinate(800 +i*1000,170,70,70),"src/main/java/com/example/project_try/assets/RedOrc2.png",20,60,root,islands,orcs,chests,coins);
-                orcs.add(orc3);
-                orc3.AnimateGravity(islands,orcs,root);
-                root.getChildren().addAll(orc3.imageView);
+                if(i*2-1==17){
+                    Orcs orc3 = new Orcs(new Coordinate(800 +i*1000,170,70,70),"src/main/java/com/example/project_try/assets/RedOrc1.png",20,30,root,islands,orcs,chests,coins,10);
+                    orcs.add(orc3);
+                    orc3.AnimateGravity(islands,orcs,root);
+                    root.getChildren().addAll(orc3.imageView);
+                }else{
+                    Orcs orc3 = new Orcs(new Coordinate(800 +i*1000,170,40,40),"src/main/java/com/example/project_try/assets/RedOrc1.png",20,30,root,islands,orcs,chests,coins,10);
+                    orcs.add(orc3);
+                    orc3.AnimateGravity(islands,orcs,root);
+                    root.getChildren().addAll(orc3.imageView);
+                }
 
 
         }
+
+
+
     }
 
     public ArrayList<Coin> getCoins() {
@@ -314,7 +334,7 @@ public class Game implements Serializable {
         islands = previousGame.getIslands();
 
         //Island Spawning
-        for(int i=0;i<100;i++){
+        for(int i=0;i<10;i++){
             islands.get(i*3+0).setImageView(new ImageView(new Image(new FileInputStream("src/main/java/com/example/project_try/assets/BalancingRocks4.png"))));
             islands.get(i*3+1).setImageView(new ImageView(new Image(new FileInputStream("src/main/java/com/example/project_try/assets/BalancingRocks5.png"))));
             islands.get(i*3+2).setImageView(new ImageView(new Image(new FileInputStream("src/main/java/com/example/project_try/assets/BalancingRocks3.png"))));
@@ -325,8 +345,9 @@ public class Game implements Serializable {
         chests = previousGame.getChests();
         int j =0;
         //Spawning Chest
-        for(int i =0;i<100;i+=2){
-
+        Iterator<Chest> iterator = chests.iterator();
+        while(iterator.hasNext()){
+            iterator.next();
             if(!chests.get(j).getIsOpen()){
                 chests.get(j).setImageView(new ImageView(new Image(new FileInputStream("src/main/java/com/example/project_try/assets/ChestClosed.png"))));
             }else{
@@ -340,7 +361,7 @@ public class Game implements Serializable {
         coins = previousGame.getCoins();
 
         //Coin Spawn
-        for (int i=0;i<100;i++){
+        for (int i=0;i<10;i++){
             coins.get(i*6+0).setImageView(new ImageView(new Image(new FileInputStream("src/main/java/com/example/project_try/assets/Coin.png"))));
             coins.get(i*6+1).setImageView(new ImageView(new Image(new FileInputStream("src/main/java/com/example/project_try/assets/Coin.png"))));
             coins.get(i*6+2).setImageView(new ImageView(new Image(new FileInputStream("src/main/java/com/example/project_try/assets/Coin.png"))));
@@ -373,7 +394,7 @@ public class Game implements Serializable {
 
         orcs = previousGame.getOrcs();
 
-        for(int i=0;i<99;i++){
+        for(int i=0;i<9;i++){
 
 //                Orcs orc1 = new Orcs(new Coordinate(120 +i*1000,170,40,50),"src/main/java/com/example/project_try/assets/Orc1.png",10,30,root,islands,orcs,chests,coins);
 //                orcs.add(orc1);

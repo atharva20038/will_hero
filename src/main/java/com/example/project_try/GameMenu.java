@@ -1,6 +1,5 @@
 package com.example.project_try;
 
-import javafx.application.Application;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -8,8 +7,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -17,12 +14,19 @@ import javafx.stage.Stage;
 
 import java.io.*;
 
-public class PauseMenu implements Serializable{
-    User user = new User();
-    Game gameMenu = new Game(user,this,null);
+public class GameMenu implements Serializable{
+    private User user = new User();
+    private Game gameMenu = new Game(user,this,null);
     transient Stage stage;
     transient Label scoreLabel;
     transient Label coinCount;
+    private Database database;
+    private int counter;
+
+    GameMenu(Database database){
+        this.database = database;
+        counter=0;
+    }
 
 
     public void setStage(Stage stage) {
@@ -260,9 +264,11 @@ public class PauseMenu implements Serializable{
     }
 
     public void SaveGame() throws IOException, ClassNotFoundException, InterruptedException {
+
         FileOutputStream fileOutputStream = new FileOutputStream("out.txt");
         ObjectOutputStream outputStream = new ObjectOutputStream(fileOutputStream);
         SaveGame saveGame = new SaveGame(gameMenu);
+        database.getSaveGames().add(saveGame);
         outputStream.writeObject(saveGame);
         outputStream.close();
         fileOutputStream.close();
@@ -275,7 +281,6 @@ public class PauseMenu implements Serializable{
         ObjectInputStream inputStream = new ObjectInputStream(fileInputStream);
         SaveGame saveGame = (SaveGame) inputStream.readObject();
 //        saveGame.game.display(stage);
-
         saveGame.game.loadPreviousGame(stage,saveGame.game);
         inputStream.close();
         fileInputStream.close();
@@ -303,7 +308,7 @@ public class PauseMenu implements Serializable{
                 System.out.println("Load Game");
                 break;
             case 3:
-                PauseMenu pauseMenu = this;
+                GameMenu pauseMenu = this;
                 //New Game
                 System.out.println("Load New Game");
                 try {

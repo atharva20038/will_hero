@@ -114,14 +114,38 @@ public class Hero extends Characters implements Collision{
     }
 
     private AnimationTimer collideOrc(){
-
+        Hero hero = this;
         AnimationTimer animationTimerOrc = new AnimationTimer() {
             @Override
             public void handle(long l) {
+                if(hero.life<=0){
+                    try {
+                        if(Integer.parseInt(coinCount.getText())>=10){
+                            int min = 0;
+                            for(int i=0;i<islands.size();i++){
+                                min = Math.min((int)(islands.get(i).imageView.getLayoutX()-imageView.getLayoutX()),min);
+                            }
+
+                            imageView.setX(min+hero.imageView.getLayoutX());
+                        }else{
+                            currentGame.endGame();
+                            System.out.println("Hero is dead");
+                        }
+
+                        this.stop();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 for(int i=0;i<orcs.size();i++){
                     //collide orc
-                    if(orcs.get(i).imageView.getBoundsInParent().intersects(imageView.getBoundsInParent())){
-
+                    if(!orcs.get(i).isDead()&&orcs.get(i).imageView.getBoundsInParent().intersects(imageView.getBoundsInParent())){
+                        orcs.get(i).attack(hero);
                         if(helmet.getActiveWeapon()!=null){
                             WeaponAnimate();
                             helmet.getActiveWeapon().attack(orcs.get(i));
@@ -144,6 +168,10 @@ public class Hero extends Characters implements Collision{
                         }
 
                     }
+                }
+                if(orcs.get(17).isDead()){
+                    currentGame.win(currentGame.getStage());
+                    this.stop();
                 }
             }
 
@@ -219,8 +247,23 @@ public class Hero extends Characters implements Collision{
         translateTransition.setOnFinished(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                try {
-                    currentGame.endGame();
+
+                    try {
+                        if(Integer.parseInt(coinCount.getText())>=10){
+                            int min = 0;
+                            for(int i=0;i<islands.size();i++){
+                                min = Math.min((int)(islands.get(i).imageView.getLayoutX()-imageView.getLayoutX()),min);
+                            }
+
+                            imageView.setX(min+imageView.getLayoutX());
+                            imageView.setY(0);
+                            AnimateY(islands);
+                            coinScore -=10;
+                            coinCount.setText(Integer.parseInt(coinCount.getText())-10+"");
+                        }else{
+                            currentGame.endGame();
+                            System.out.println("Hero is dead");
+                        }
                 } catch (IOException | ClassNotFoundException | InterruptedException e) {
                     e.printStackTrace();
                 }
